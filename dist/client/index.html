@@ -7,11 +7,19 @@
     <style>
       body {
         margin: 0;
-        overflow: hidden;
+        overflow: scroll;
+      }
+      .canvas {
+        width: 200px;
+        height: 200px;
       }
     </style>
   </head>
   <body>
+    <div>Orthographic view looking up from (0, 0, -2)</div>
+    <canvas id="c2" class="canvas"></canvas>
+    <div>Perspective view looking up from (0, 0, -2)</div>
+    <canvas id="c3" class="canvas"></canvas>
     <script type="module" src="./bundle.js"></script>
   </body>
 </html>
