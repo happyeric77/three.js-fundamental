@@ -1,13 +1,16 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Stats from "three/examples/jsm/libs/stats.module.js";
+import { GUI } from "dat.gui";
 
-// const animate = (render: THREE.WebGLRenderer) => {
-//   requestAnimationFrame(() => animate(render));
-//   cube.rotation.x += 0.01;
-//   cube.rotation.y += 0.01;
-//   cube.rotation.z += 0.01;
-//   renderer.render(scene, camera);
-// };
+const stats = new Stats();
+document.body.appendChild(stats.dom);
+
+const animate = (render: THREE.WebGLRenderer) => {
+  requestAnimationFrame(() => animate(render));
+  stats.update();
+  render.render(scene, camera);
+};
 
 const onWindowResize = () => {
   camera.aspect = window.innerWidth / window.innerHeight;
@@ -33,24 +36,10 @@ const camera = new THREE.PerspectiveCamera(
   1000
 );
 
-const camera2 = new THREE.OrthographicCamera();
-const camera3 = new THREE.PerspectiveCamera();
-
-const canvas2 = document.getElementById("c2")!;
-const canvas3 = document.getElementById("c3")!;
-const renderer2 = new THREE.WebGLRenderer({ canvas: canvas2 });
-const renderer3 = new THREE.WebGL1Renderer({ canvas: canvas3 });
-
 const control = new OrbitControls(camera, renderer.domElement);
 control.addEventListener("change", () => renderer.render(scene, camera));
 
-// camera.position.set(1, 2, 5);
-camera.position.z = -2;
-camera.lookAt(new THREE.Vector3()); // default is 0,0,0
-camera2.position.z = -2;
-camera2.lookAt(new THREE.Vector3()); // default is 0,0,0
-camera3.position.z = -2;
-camera3.lookAt(new THREE.Vector3()); // default is 0,0,0
+camera.position.set(1, 2, 5);
 
 const geometry = new THREE.BoxGeometry();
 const material = new THREE.MeshBasicMaterial({
@@ -64,8 +53,17 @@ scene.add(cube);
 const axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
 
-// renderer.setAnimationLoop((time, _frame) => animate(time, renderer));
-// animate(renderer);
+animate(renderer);
 renderer.render(scene, camera);
-renderer2.render(scene, camera2);
-renderer3.render(scene, camera3);
+
+const gui = new GUI();
+const cubeFolder = gui.addFolder("Cube");
+cubeFolder.add(cube.rotation, "x", 0, Math.PI * 2);
+cubeFolder.add(cube.rotation, "y", 0, Math.PI * 2);
+cubeFolder.add(cube.rotation, "z", 0, Math.PI * 2);
+cubeFolder.open();
+const cameraFolder = gui.addFolder("Camera");
+cameraFolder.add(camera.position, "x", -10, 10);
+cameraFolder.add(camera.position, "y", -10, 10);
+cameraFolder.add(camera.position, "z", -10, 10);
+cameraFolder.open();
