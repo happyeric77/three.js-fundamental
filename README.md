@@ -20,4 +20,4 @@ npm install
 npm run serve
 ```
 
-## TO BE CONTINUED ...
+> Checkout the detailed documentation [here](https://colorfullife-docs.vercel.app/three.js/fundamental)
