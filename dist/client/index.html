@@ -9,17 +9,22 @@
         margin: 0;
         overflow: scroll;
       }
-      .canvas {
-        width: 200px;
-        height: 200px;
+      #debug1 {
+        font-family: monospace;
+        font-size: larger;
+        position: absolute;
+        left: 0px;
+        top: 50px;
+        border: 1px solid red;
+        width: 180px;
+        height: 220px;
+        color: white;
+        pointer-events: none;
       }
     </style>
   </head>
   <body>
-    <div>Orthographic view looking up from (0, 0, -2)</div>
-    <canvas id="c2" class="canvas"></canvas>
-    <div>Perspective view looking up from (0, 0, -2)</div>
-    <canvas id="c3" class="canvas"></canvas>
+    <div id="debug1"></div>
     <script type="module" src="./bundle.js"></script>
   </body>
 </html>
