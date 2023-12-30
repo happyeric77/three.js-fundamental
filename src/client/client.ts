@@ -10,40 +10,13 @@ const debug = document.getElementById("debug1") as HTMLDivElement;
 
 const animate = (render: THREE.WebGLRenderer) => {
   requestAnimationFrame(() => animate(render));
-  stats.update();
+
   render.render(scene, camera);
-  debug.innerText = `Transform matrix:\n${JSON.stringify(
-    cube.matrix.elements
-  )}`;
+  stats.update();
+  // debug.innerText = `Transform matrix:\n${JSON.stringify(
+  //   cube.matrix.elements
+  // )}`;
   // Update debug console
-  //   const object1WorldPosition = new THREE.Vector3();
-  //   object1.getWorldPosition(object1WorldPosition);
-  //   const object2WorldPosition = new THREE.Vector3();
-  //   object2.getWorldPosition(object2WorldPosition);
-  //   const object3WorldPosition = new THREE.Vector3();
-  //   object3.getWorldPosition(object3WorldPosition);
-  //   debug.innerText =
-  //     "Red\n" +
-  //     "Local Pos X : " +
-  //     object1.position.x.toFixed(2) +
-  //     "\n" +
-  //     "World Pos X : " +
-  //     object1WorldPosition.x.toFixed(2) +
-  //     "\n" +
-  //     "\nGreen\n" +
-  //     "Local Pos X : " +
-  //     object2.position.x.toFixed(2) +
-  //     "\n" +
-  //     "World Pos X : " +
-  //     object2WorldPosition.x.toFixed(2) +
-  //     "\n" +
-  //     "\nBlue\n" +
-  //     "Local Pos X : " +
-  //     object3.position.x.toFixed(2) +
-  //     "\n" +
-  //     "World Pos X : " +
-  //     object3WorldPosition.x.toFixed(2) +
-  //     "\n";
 };
 
 const onWindowResize = () => {
@@ -72,53 +45,40 @@ const camera = new THREE.PerspectiveCamera(
 
 const control = new OrbitControls(camera, renderer.domElement);
 control.addEventListener("change", () => renderer.render(scene, camera));
-// control.target.set(5, 5, 5);
 
 camera.position.set(8, 4, 4);
-
-// Objects and Lights
-
-// const light1 = new THREE.PointLight(0xffffff, 400);
-// light1.position.set(10, 10, 10);
-// scene.add(light1);
-
-// const light2 = new THREE.PointLight(0xffffff, 400);
-// light2.position.set(-10, 10, 10);
-// scene.add(light2);
-
-// const object1 = new THREE.Mesh(
-//   new THREE.SphereGeometry(),
-//   new THREE.MeshPhongMaterial({ color: "pink" })
-// );
-// scene.add(object1);
-// scene.add(new THREE.AxesHelper(5));
-
-// object1.position.set(4, 0, 0);
-// object1.add(new THREE.AxesHelper(5));
-
-// const object2 = new THREE.Mesh(
-//   new THREE.SphereGeometry(),
-//   new THREE.MeshPhongMaterial({ color: "white" })
-// );
-
-// object1.add(object2);
-// object2.position.set(4, 0, 0);
-// object2.add(new THREE.AxesHelper(5));
-
-// const object3 = new THREE.Mesh(
-//   new THREE.SphereGeometry(),
-//   new THREE.MeshPhongMaterial({ color: "green" })
-// );
-// object3.position.set(4, 0, 0);
-
-// object2.add(object3);
-// object3.add(new THREE.AxesHelper(5));
 camera.position.set(1, 2, 5);
-const cube = new THREE.Mesh(
-  new THREE.BoxGeometry(),
-  new THREE.MeshBasicMaterial({ color: "pink", wireframe: true })
-);
+
+const boxGeometry = new THREE.BoxGeometry();
+const sphereGeometry = new THREE.SphereGeometry();
+const icosahedronGeometry = new THREE.IcosahedronGeometry();
+const planeGeometry = new THREE.PlaneGeometry();
+const toursKnotGeometry = new THREE.TorusKnotGeometry();
+
+// const material = new THREE.MeshBasicMaterial({
+//   color: "pink",
+//   wireframe: true,
+// });
+
+const material = new THREE.MeshNormalMaterial();
+
+const cube = new THREE.Mesh(boxGeometry, material);
+cube.position.x = 5;
 scene.add(cube);
+const sphere = new THREE.Mesh(sphereGeometry, material);
+sphere.position.x = 3;
+scene.add(sphere);
+const icosahedron = new THREE.Mesh(icosahedronGeometry, material);
+icosahedron.position.x = 1;
+scene.add(icosahedron);
+const plane = new THREE.Mesh(planeGeometry, material);
+plane.position.x = -1;
+scene.add(plane);
+
+const torusKnot = new THREE.Mesh(toursKnotGeometry, material);
+torusKnot.position.x = -4;
+scene.add(torusKnot);
+
 const axesHelper = new THREE.AxesHelper(5);
 scene.add(axesHelper);
 
@@ -126,74 +86,34 @@ animate(renderer);
 renderer.render(scene, camera);
 
 // dat.gui
+
+const options = {
+  side: {
+    FrontSide: THREE.FrontSide,
+    BackSide: THREE.BackSide,
+    DoubleSide: THREE.DoubleSide,
+  },
+};
 const gui = new GUI();
 
-// const object1Folder = gui.addFolder("Object1");
-// object1Folder.add(object1.position, "x", -10, 10).name("x position");
-// object1Folder.add(object1.rotation, "x", 0, Math.PI * 2).name("x rotation");
-// object1Folder.add(object1.scale, "x", 0, 10).name("x scale");
-// object1Folder.open();
+const materialFolder = gui.addFolder("Material");
+materialFolder
+  .add(material, "transparent")
+  .onChange(() => (material.needsUpdate = true));
+materialFolder.add(material, "opacity", 0, 1, 0.01);
+materialFolder.add(material, "depthTest");
+materialFolder.add(material, "depthWrite");
+materialFolder
+  .add(material, "alphaTest", 0, 1, 0.01)
+  .onChange(() => updateMaterial());
+materialFolder.add(material, "visible");
+materialFolder
+  .add(material, "side", options.side)
+  .onChange(() => updateMaterial());
 
-// const object2Folder = gui.addFolder("Object2");
-// object2Folder.add(object2.position, "x", -10, 10).name("x position");
-// object2Folder.add(object2.rotation, "x", 0, Math.PI * 2).name("x rotation");
-// object2Folder.add(object2.scale, "x", 0, 10).name("x scale");
-// object2Folder.open();
+materialFolder.open();
 
-// const object3Folder = gui.addFolder("Object3");
-// object3Folder.add(object3.position, "x", -10, 10).name("x position");
-// object3Folder.add(object3.rotation, "x", 0, Math.PI * 2).name("x rotation");
-// object3Folder.add(object3.scale, "x", 0, 10).name("x scale");
-// object3Folder.open();
-
-const cubeFolder = gui.addFolder("Cube");
-cubeFolder.add(cube.position, "x", -10, 10).name("x position");
-cubeFolder.add(cube.rotation, "x", 0, Math.PI * 2).name("x rotation");
-cubeFolder.add(cube.scale, "x", 0, 10).name("x scale");
-cubeFolder.open();
-
-const cubeData = {
-  width: 1,
-  height: 1,
-  depth: 1,
-  widthSegments: 3,
-  heightSegments: 3,
-  depthSegments: 3,
-};
-
-const cubePropertiesFolder = gui.addFolder("Cube Properties");
-cubePropertiesFolder
-  .add(cubeData, "width", 1, 30)
-  .onChange(regenerateBoxGeometry)
-  .onFinishChange(() => console.log(cube.geometry));
-
-cubePropertiesFolder
-  .add(cubeData, "height", 1, 30)
-  .onChange(regenerateBoxGeometry);
-cubePropertiesFolder
-  .add(cubeData, "depth", 1, 30)
-  .onChange(regenerateBoxGeometry);
-cubePropertiesFolder
-  .add(cubeData, "widthSegments", 1, 30)
-  .onChange(regenerateBoxGeometry);
-cubePropertiesFolder
-  .add(cubeData, "heightSegments", 1, 30)
-  .onChange(regenerateBoxGeometry);
-cubePropertiesFolder
-  .add(cubeData, "depthSegments", 1, 30)
-  .onChange(regenerateBoxGeometry);
-
-cubePropertiesFolder.open();
-
-function regenerateBoxGeometry() {
-  const newGeometry = new THREE.BoxGeometry(
-    cubeData.width,
-    cubeData.height,
-    cubeData.depth,
-    cubeData.widthSegments,
-    cubeData.heightSegments,
-    cubeData.depthSegments
-  );
-  cube.geometry.dispose();
-  cube.geometry = newGeometry;
+function updateMaterial() {
+  material.side = Number(material.side) as THREE.Side;
+  material.needsUpdate = true;
 }
