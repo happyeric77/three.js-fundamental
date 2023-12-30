@@ -13,10 +13,6 @@ const animate = (render: THREE.WebGLRenderer) => {
 
   render.render(scene, camera);
   stats.update();
-  // debug.innerText = `Transform matrix:\n${JSON.stringify(
-  //   cube.matrix.elements
-  // )}`;
-  // Update debug console
 };
 
 const onWindowResize = () => {
@@ -55,12 +51,23 @@ const icosahedronGeometry = new THREE.IcosahedronGeometry();
 const planeGeometry = new THREE.PlaneGeometry();
 const toursKnotGeometry = new THREE.TorusKnotGeometry();
 
-// const material = new THREE.MeshBasicMaterial({
-//   color: "pink",
-//   wireframe: true,
-// });
+const material = new THREE.MeshBasicMaterial();
 
-const material = new THREE.MeshNormalMaterial();
+const texture = new THREE.TextureLoader().load("img/grid.png");
+material.map = texture;
+
+const envTexture = new THREE.CubeTextureLoader().load([
+  "img/px_50.png",
+  "img/nx_50.png",
+  "img/py_50.png",
+  "img/ny_50.png",
+  "img/pz_50.png",
+  "img/nz_50.png",
+]);
+envTexture.mapping = THREE.CubeReflectionMapping;
+// envTexture.mapping = THREE.CubeRefractionMapping;
+material.envMap = envTexture;
+material.needsUpdate = true;
 
 const cube = new THREE.Mesh(boxGeometry, material);
 cube.position.x = 5;
@@ -93,6 +100,11 @@ const options = {
     BackSide: THREE.BackSide,
     DoubleSide: THREE.DoubleSide,
   },
+  combine: {
+    MultiplyOperation: THREE.MultiplyOperation,
+    MixOperation: THREE.MixOperation,
+    AddOperation: THREE.AddOperation,
+  },
 };
 const gui = new GUI();
 
@@ -111,9 +123,25 @@ materialFolder
   .add(material, "side", options.side)
   .onChange(() => updateMaterial());
 
-materialFolder.open();
+const data = {
+  color: material.color.getHex(),
+};
+const meshBasicMaterialFolder = gui.addFolder("MeshBasicMaterial");
+meshBasicMaterialFolder.addColor(data, "color").onChange(() => {
+  const newColor = data.color.toString().replace("#", "0x");
+  material.color.setHex(Number(newColor));
+});
+meshBasicMaterialFolder.add(material, "wireframe");
+meshBasicMaterialFolder.add(material, "reflectivity", 0, 1, 0.1);
+// meshBasicMaterialFolder.add(material, "refractionRatio", 0, 1, 0.1); (take effect only when envMap = CubeRefractionMapping)
+meshBasicMaterialFolder
+  .add(material, "combine", options.combine)
+  .onChange(() => updateMaterial());
+
+meshBasicMaterialFolder.open();
 
 function updateMaterial() {
   material.side = Number(material.side) as THREE.Side;
+  material.combine = Number(material.combine) as THREE.Combine;
   material.needsUpdate = true;
 }
